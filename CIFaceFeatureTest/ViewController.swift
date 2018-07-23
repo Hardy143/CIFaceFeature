@@ -26,6 +26,8 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     // Face Detector
     var faceDetector = CIDetector(ofType: CIDetectorTypeFace, context: nil, options: [CIDetectorAccuracy : CIDetectorAccuracyHigh,
                                                                                       CIDetectorTracking : true])
+    var isFaceDetected = false
+    var haveEyesBlinked = false
     
     // AVAssetWriter
     var isRecording = false
@@ -43,6 +45,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         super.viewDidLoad()
 
         faceDetectedLabel.isHidden = true
+        recordButton.isHidden = true
         
         setupCamera()
     }
@@ -272,15 +275,20 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                                                                          ]).compactMap({ $0 as? CIFaceFeature })
 
             // Retreive frame of your buffer
-            let desc = CMSampleBufferGetFormatDescription(sampleBuffer)
-            let bufferFrame = CMVideoFormatDescriptionGetCleanAperture(desc!, false)
+//            let desc = CMSampleBufferGetFormatDescription(sampleBuffer)
+//            let bufferFrame = CMVideoFormatDescriptionGetCleanAperture(desc!, false)
+            
+            DispatchQueue.main.async {
+                self.faceDetection(features: features!)
+            }
+            
 
             // Draw face masks
-            DispatchQueue.main.async { [weak self] in
-                UIView.animate(withDuration: 0.2) {
-                self?.drawFaceMasksFor(features: features!, bufferFrame: bufferFrame)
-                }
-            }
+//            DispatchQueue.main.async { [weak self] in
+//                UIView.animate(withDuration: 0.2) {
+//                self?.drawFaceMasksFor(features: features!, bufferFrame: bufferFrame)
+//                }
+//            }
         }
         
         if writable,
@@ -297,6 +305,25 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
             //print("audio buffering")
         }
   
+    }
+    
+    //MARK: face detector method
+    func faceDetection(features: [CIFaceFeature]) {
+        
+        //Do nothing if no face is dected
+        guard !features.isEmpty else {
+            faceDetectedLabel.isHidden = false
+            return
+        }
+        
+        for feature in features {
+            if feature.leftEyeClosed,
+                feature.rightEyeClosed {
+                haveEyesBlinked = true
+                recordButton.isHidden = false
+                faceDetectedLabel.isHidden = true
+            }
+        }
     }
     
     // MARK: show faces on screen
@@ -333,24 +360,30 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                               height: faceRect.height * yScale)
 
             //Reuse the face's layer
-            var faceLayer = view.layer.sublayers?
-                .filter { $0.name == "MaskFace" && $0.isHidden == true }
-                .first
-            if faceLayer == nil {                
-                // prepare layer
-                faceLayer = CALayer()
-                faceLayer?.name = "MaskFace"
-                faceLayer?.backgroundColor = UIColor.clear.cgColor
-                faceLayer?.borderColor = UIColor.red.cgColor
-                faceLayer?.borderWidth = 3.0
-                faceLayer?.frame = faceRect
-                faceLayer?.masksToBounds = true
-                faceLayer?.contentsGravity = kCAGravityResizeAspectFill
-                view.layer.addSublayer(faceLayer!)
-                
-            } else {
-                faceLayer?.frame = faceRect
-                faceLayer?.isHidden = false
+//            var faceLayer = view.layer.sublayers?
+//                .filter { $0.name == "MaskFace" && $0.isHidden == true }
+//                .first
+//            if faceLayer == nil {
+//                // prepare layer
+//                faceLayer = CALayer()
+//                faceLayer?.name = "MaskFace"
+//                faceLayer?.backgroundColor = UIColor.clear.cgColor
+//                faceLayer?.borderColor = UIColor.red.cgColor
+//                faceLayer?.borderWidth = 3.0
+//                faceLayer?.frame = faceRect
+//                faceLayer?.masksToBounds = true
+//                faceLayer?.contentsGravity = kCAGravityResizeAspectFill
+//                view.layer.addSublayer(faceLayer!)
+//
+//            } else {
+//                faceLayer?.frame = faceRect
+//                faceLayer?.isHidden = false
+//            }
+            
+            if feature.leftEyeClosed,
+                feature.rightEyeClosed {
+                haveEyesBlinked = true
+                recordButton.isHidden = false
             }
             
 
