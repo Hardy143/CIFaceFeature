@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" systemVersion="17A277" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,16 +13,94 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="CIFaceFeatureTest" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Tdc-3h-MVM">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fev-Fv-3Wh">
+                                <rect key="frame" x="156" y="623" width="62" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Record"/>
+                                <connections>
+                                    <action selector="recordButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="j8G-Gw-VmN"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Face Detected" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wqC-jB-r7a">
+                                <rect key="frame" x="115" y="323" width="145.5" height="21.5"/>
+                                <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="fev-Fv-3Wh" firstAttribute="centerX" secondItem="Tdc-3h-MVM" secondAttribute="centerX" id="DFY-Xw-dAs"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="fev-Fv-3Wh" secondAttribute="bottom" constant="8" id="OuK-Yf-hOn"/>
+                            <constraint firstItem="Tdc-3h-MVM" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="Yax-Y4-PzT"/>
+                            <constraint firstItem="Tdc-3h-MVM" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="i25-1k-HHS"/>
+                            <constraint firstItem="wqC-jB-r7a" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="iEJ-WL-fEl"/>
+                            <constraint firstItem="Tdc-3h-MVM" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="mWa-1G-Olf"/>
+                            <constraint firstItem="Tdc-3h-MVM" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="nVt-NP-m2i"/>
+                            <constraint firstItem="wqC-jB-r7a" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="whP-ja-1Os"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="faceDetectedLabel" destination="wqC-jB-r7a" id="Ane-bq-1Oa"/>
+                        <outlet property="previewView" destination="Tdc-3h-MVM" id="UUQ-wn-jfU"/>
+                        <outlet property="recordButton" destination="fev-Fv-3Wh" id="ZT8-iR-rAn"/>
+                        <segue destination="mFd-yQ-ON8" kind="presentation" identifier="previewVideo" id="oLF-OA-X4J"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="32.799999999999997" y="31.934032983508249"/>
+        </scene>
+        <!--Video Preview View Controller-->
+        <scene sceneID="T09-Ps-QqW">
+            <objects>
+                <viewController id="mFd-yQ-ON8" customClass="VideoPreviewViewController" customModule="CIFaceFeatureTest" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="CJZ-ux-IxR">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TNN-3l-VGe">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yKp-88-r09">
+                                <rect key="frame" x="29" y="28" width="34" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="backButtonPressed:" destination="mFd-yQ-ON8" eventType="touchUpInside" id="Kes-6f-lgC"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="TNN-3l-VGe" firstAttribute="trailing" secondItem="M5t-8Z-YXh" secondAttribute="trailing" id="G14-48-P8l"/>
+                            <constraint firstItem="yKp-88-r09" firstAttribute="top" secondItem="M5t-8Z-YXh" secondAttribute="top" constant="8" id="IVU-1i-EPi"/>
+                            <constraint firstItem="M5t-8Z-YXh" firstAttribute="bottom" secondItem="TNN-3l-VGe" secondAttribute="bottom" id="JWC-9t-nnG"/>
+                            <constraint firstItem="TNN-3l-VGe" firstAttribute="top" secondItem="CJZ-ux-IxR" secondAttribute="top" id="LD4-W7-50u"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="yKp-88-r09" secondAttribute="trailing" constant="20" symbolic="YES" id="OCH-JA-Ykg"/>
+                            <constraint firstItem="yKp-88-r09" firstAttribute="leading" secondItem="M5t-8Z-YXh" secondAttribute="leading" constant="29" id="lCK-vF-k33"/>
+                            <constraint firstItem="TNN-3l-VGe" firstAttribute="leading" secondItem="M5t-8Z-YXh" secondAttribute="leading" id="yFa-Zl-C0Y"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="M5t-8Z-YXh"/>
+                    </view>
+                    <connections>
+                        <outlet property="videoView" destination="TNN-3l-VGe" id="1gk-wX-6TN"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="BzB-JR-Ef4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="840.79999999999995" y="35.532233883058474"/>
         </scene>
     </scenes>
 </document>

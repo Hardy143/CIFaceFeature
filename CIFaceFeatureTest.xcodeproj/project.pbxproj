@@ -8,20 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		99AC8A8020FD014800A4CF93 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8A7F20FD014800A4CF93 /* AppDelegate.swift */; };
-		99AC8A8220FD014800A4CF93 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8A8120FD014800A4CF93 /* ViewController.swift */; };
 		99AC8A8520FD014800A4CF93 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99AC8A8320FD014800A4CF93 /* Main.storyboard */; };
 		99AC8A8720FD014800A4CF93 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99AC8A8620FD014800A4CF93 /* Assets.xcassets */; };
 		99AC8A8A20FD014800A4CF93 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99AC8A8820FD014800A4CF93 /* LaunchScreen.storyboard */; };
+		99AC8A9320FD03A100A4CF93 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99AC8A9220FD03A100A4CF93 /* AVFoundation.framework */; };
+		99AC8A9720FE4F7D00A4CF93 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8A9620FE4F7D00A4CF93 /* ViewController.swift */; };
+		99AC8AF820FF958F00A4CF93 /* VideoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		99AC8A7C20FD014800A4CF93 /* CIFaceFeatureTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CIFaceFeatureTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99AC8A7F20FD014800A4CF93 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		99AC8A8120FD014800A4CF93 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		99AC8A8420FD014800A4CF93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		99AC8A8620FD014800A4CF93 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		99AC8A8920FD014800A4CF93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		99AC8A8B20FD014800A4CF93 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		99AC8A9220FD03A100A4CF93 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		99AC8A9620FE4F7D00A4CF93 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPreviewViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99AC8A9320FD03A100A4CF93 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +45,7 @@
 			children = (
 				99AC8A7E20FD014800A4CF93 /* CIFaceFeatureTest */,
 				99AC8A7D20FD014800A4CF93 /* Products */,
+				99AC8A9120FD03A000A4CF93 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -55,13 +61,22 @@
 			isa = PBXGroup;
 			children = (
 				99AC8A7F20FD014800A4CF93 /* AppDelegate.swift */,
-				99AC8A8120FD014800A4CF93 /* ViewController.swift */,
+				99AC8A9620FE4F7D00A4CF93 /* ViewController.swift */,
 				99AC8A8320FD014800A4CF93 /* Main.storyboard */,
+				99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */,
 				99AC8A8620FD014800A4CF93 /* Assets.xcassets */,
 				99AC8A8820FD014800A4CF93 /* LaunchScreen.storyboard */,
 				99AC8A8B20FD014800A4CF93 /* Info.plist */,
 			);
 			path = CIFaceFeatureTest;
+			sourceTree = "<group>";
+		};
+		99AC8A9120FD03A000A4CF93 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				99AC8A9220FD03A100A4CF93 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,7 +150,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				99AC8A8220FD014800A4CF93 /* ViewController.swift in Sources */,
+				99AC8AF820FF958F00A4CF93 /* VideoPreviewViewController.swift in Sources */,
+				99AC8A9720FE4F7D00A4CF93 /* ViewController.swift in Sources */,
 				99AC8A8020FD014800A4CF93 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
