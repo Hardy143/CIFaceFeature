@@ -15,7 +15,6 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     
     @IBOutlet weak var previewView: UIView!
     @IBOutlet weak var recordButton: UIButton!
-    @IBOutlet weak var faceDetectedLabel: UILabel!
 
     // AVCaptureSession
     var cameraSession = AVCaptureSession()
@@ -27,7 +26,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     var faceDetector = CIDetector(ofType: CIDetectorTypeFace, context: nil, options: [CIDetectorAccuracy : CIDetectorAccuracyHigh,
                                                                                       CIDetectorTracking : true])
     var isFaceDetected = false
-    var haveEyesBlinked = false
+    var faceFrameCounter = 0
     
     // AVAssetWriter
     var isRecording = false
@@ -44,9 +43,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        faceDetectedLabel.isHidden = true
         recordButton.isHidden = true
-        
         setupCamera()
     }
     
@@ -134,15 +131,15 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         
         do {
             outputFileLocation = videoFileLocation()
-            videoWriter = try AVAssetWriter(outputURL: outputFileLocation!, fileType: AVFileType.mov)
+            videoWriter = try AVAssetWriter(outputURL: outputFileLocation!, fileType: AVFileType.mp4)
             
             // add video input
             videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: [
                 AVVideoCodecKey : AVVideoCodecType.h264,
-                AVVideoWidthKey : 720,
-                AVVideoHeightKey : 1280,
+                AVVideoWidthKey : 480,
+                AVVideoHeightKey : 853,
                 AVVideoCompressionPropertiesKey : [
-                    AVVideoAverageBitRateKey : 2300000,
+                    AVVideoAverageBitRateKey : 500000,
                 ],
                 ])
             
@@ -170,10 +167,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                 print("audio input added")
             }
             
-            videoWriterInputPixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriterInput, sourcePixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,
-//                                                                                                                                                          kCVPixelBufferWidthKey as String: Constant.Configuration.DefaultAssetSize.width,
-//                                                                                                                                                          kCVPixelBufferHeightKey as String: Constant.Configuration.DefaultAssetSize.height,
-                                                                                                                                                          kCVPixelFormatOpenGLESCompatibility as String: true,])
+            videoWriterInputPixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriterInput, sourcePixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,kCVPixelFormatOpenGLESCompatibility as String: true,])
             
             
             videoWriter.startWriting()
@@ -186,7 +180,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     //video file location method
     func videoFileLocation() -> URL {
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
-        let videoOutputUrl = URL(fileURLWithPath: documentsPath.appendingPathComponent("videoFile")).appendingPathExtension("mov")
+        let videoOutputUrl = URL(fileURLWithPath: documentsPath.appendingPathComponent("videoFile")).appendingPathExtension("mp4")
         do {
             if FileManager.default.fileExists(atPath: videoOutputUrl.path) {
                 try FileManager.default.removeItem(at: videoOutputUrl)
@@ -209,6 +203,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         guard !isRecording else { return }
         isRecording = true
         sessionAtSourceTime = nil
+        print("here")
         setupWriter()
         print(isRecording)
         print(videoWriter)
@@ -223,7 +218,6 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         } else {
             print("status completed")
         }
-        
     }
     
     // MARK: Stop recording
@@ -240,13 +234,26 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         performSegue(withIdentifier: "previewVideo", sender: nil)
     }
     
+    //MARK: Cancel recording
+    func cancel() {
+        
+        videoWriter.cancelWriting()
+        print("cancelled")
+        recordButton.setTitle("Record", for: .normal)
+        isRecording = false
+        recordButton.isHidden = true
+        
+        let alert = UIAlertController(title: "Error", message: "Please ensure your face is infront of the camera", preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        alert.addAction(alertAction)
+        present(alert, animated: true, completion: nil) 
+        
+    }
+    
     // MARK: AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioOutputSampleBufferDelegate
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
 
         let writable = canWrite()
-        if writable {
-           // print("Writable")
-        }
         
         if writable,
             sessionAtSourceTime == nil {
@@ -310,18 +317,26 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     //MARK: face detector method
     func faceDetection(features: [CIFaceFeature]) {
         
-        //Do nothing if no face is dected
+        //If no face is detected start counter
         guard !features.isEmpty else {
-            faceDetectedLabel.isHidden = false
+            
+            // cancel the recording if no face is detected
+            if isRecording {
+            faceFrameCounter += 1
+            print(faceFrameCounter)
+                if faceFrameCounter == 50 {
+                    cancel()
+                    faceFrameCounter = 0
+                }
+            }
+            
             return
         }
         
         for feature in features {
             if feature.leftEyeClosed,
                 feature.rightEyeClosed {
-                haveEyesBlinked = true
                 recordButton.isHidden = false
-                faceDetectedLabel.isHidden = true
             }
         }
     }
@@ -337,12 +352,10 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         
         //Do nothing if no face is dected
         guard !features.isEmpty else {
-            faceDetectedLabel.isHidden = false
             CATransaction.commit()
             return
         }
         
-        faceDetectedLabel.isHidden = true
         //The problem is we detect the faces on video image size
         //but when we show on the screen which might smaller or bigger than your video size
         //so we need to re-calculate the faces bounds to fit to your screen
@@ -382,11 +395,8 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
             
             if feature.leftEyeClosed,
                 feature.rightEyeClosed {
-                haveEyesBlinked = true
                 recordButton.isHidden = false
             }
-            
-
         }
         
         CATransaction.commit()
