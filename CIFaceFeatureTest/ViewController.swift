@@ -15,7 +15,8 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     
     @IBOutlet weak var previewView: UIView!
     @IBOutlet weak var recordButton: UIButton!
-
+    @IBOutlet weak var instructionPhrase: UILabel!
+    
     // AVCaptureSession
     var cameraSession = AVCaptureSession()
     var videoDataOutput = AVCaptureVideoDataOutput()
@@ -28,6 +29,9 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                                                                                       CIDetectorTracking : true])
     var isFaceDetected = false
     var faceFrameCounter = 0
+    var rightEyeCounter = 0
+    var leftEyeCounter = 0
+    var phase = 0
     
     // AVAssetWriter for video
     var isRecording = false
@@ -50,6 +54,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         super.viewDidLoad()
 
         recordButton.isHidden = true
+        instructionPhrase.isHidden = true
         setupCamera()
     }
     
@@ -300,7 +305,11 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         recordButton.setTitle("Record", for: .normal)
         isRecording = false
         recordButton.isHidden = true
-        
+        phase = 0
+        faceFrameCounter = 0
+        rightEyeCounter = 0
+        leftEyeCounter = 0
+
         let alert = UIAlertController(title: "Error", message: "Please ensure your face is infront of the camera", preferredStyle: .alert)
         let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
         alert.addAction(alertAction)
@@ -321,8 +330,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         //            let bufferFrame = CMVideoFormatDescriptionGetCleanAperture(desc!, false)
         
         // Detects faces based on your ciimage
-        let features = faceDetector?.features(in: ciImage, options: [CIDetectorSmile : true,
-                                                                     CIDetectorEyeBlink : true,
+        let features = faceDetector?.features(in: ciImage, options: [CIDetectorEyeBlink : true,
                                                                      ]).compactMap({ $0 as? CIFaceFeature })
         
         //If no face is detected start counter
@@ -341,11 +349,32 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
             return
         }
         
+        
+        
         for feature in features! {
-            if feature.leftEyeClosed,
-                feature.rightEyeClosed {
-                DispatchQueue.main.sync {
-                    recordButton.isHidden = false
+            print("Instruction phase: \(phase)")
+            if phase == 0 {
+                instructionPhrase.isHidden = false
+                instructionPhrase.text = "Close your right eye"
+                if feature.rightEyeClosed {
+                    rightEyeCounter += 1
+                    print(rightEyeCounter)
+                    if rightEyeCounter == 25 {
+                            phase = 1
+                            instructionPhrase.text = "Close your left eye"
+                    }
+                } else {
+                    rightEyeCounter = 0
+                }
+            } else if phase == 1 {
+                if feature.leftEyeClosed {
+                    leftEyeCounter += 1
+                    print(leftEyeCounter)
+                    if leftEyeCounter == 25 {
+                            phase = 3
+                            instructionPhrase.isHidden = true
+                            recordButton.isHidden = false
+                    }
                 }
             }
         }
@@ -408,7 +437,9 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                 connection.isVideoMirrored = true
             }
             
-            self.faceDetection(sampleBuffer: sampleBuffer)
+            DispatchQueue.main.sync {
+                self.faceDetection(sampleBuffer: sampleBuffer)
+            }
 
             // Draw face masks
 //            DispatchQueue.main.async { [weak self] in
