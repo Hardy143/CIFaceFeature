@@ -10,17 +10,19 @@ import UIKit
 import AVFoundation
 import ImageIO
 
-class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
+class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     
     @IBOutlet weak var previewView: UIView!
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var instructionPhrase: UILabel!
     
+    // AVAudio
+    let audioRecorder = AudioRecorder()
+    
     // AVCaptureSession
     var cameraSession = AVCaptureSession()
     var videoDataOutput = AVCaptureVideoDataOutput()
-    var audioDataOutput = AVCaptureAudioDataOutput()
     var previewLayer: AVCaptureVideoPreviewLayer?
     var globalSampleBuffer: CMSampleBuffer!
     
@@ -37,18 +39,11 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     var isRecording = false
     var videoWriter: AVAssetWriter!
     var videoWriterInput: AVAssetWriterInput!
-    //var audioWriterInput: AVAssetWriterInput!
     var sessionAtSourceTime: CMTime?
     var outputFileLocation: URL?
     var videoWriterInputPixelBufferAdaptor: AVAssetWriterInputPixelBufferAdaptor!
     var sDeviceRgbColorSpace = CGColorSpaceCreateDeviceRGB()
     var bitmapInfo = CGBitmapInfo.byteOrder32Little.union(CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue))
-    
-    //AVAssetWriter for audio
-    var audioWriter: AVAssetWriter!
-    var audioWriterInput: AVAssetWriterInput!
-    var audioOutputUrl: URL?
-    var sessionAtSourceTime2: CMTime?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +51,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         recordButton.isHidden = true
         instructionPhrase.isHidden = true
         setupCamera()
+        audioRecorder.setUpAudioSession()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -66,9 +62,11 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     @IBAction func recordButtonPressed(_ sender: Any) {
         if !isRecording {
             start()
+            audioRecorder.recordAudio()
             recordButton.setTitle("Recording", for: .normal)
         } else {
             stop()
+            audioRecorder.stopRecordingAudio()
             recordButton.setTitle("Record", for: .normal)
         }
     }
@@ -117,13 +115,6 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                 cameraSession.addOutput(videoDataOutput)
             }
             
-            // define audio output
-            if cameraSession.canAddOutput(audioDataOutput) {
-                audioDataOutput.setSampleBufferDelegate(self, queue: queue)
-                cameraSession.addOutput(audioDataOutput)
-                print("audio output added")
-            }
-            
             cameraSession.commitConfiguration()
             
             // present the preview of video
@@ -145,9 +136,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         
         do {
             outputFileLocation = videoFileLocation()
-            audioOutputUrl = audioFileLocation()
             videoWriter = try AVAssetWriter(outputURL: outputFileLocation!, fileType: AVFileType.mp4)
-            audioWriter = try AVAssetWriter(outputURL: audioOutputUrl!, fileType: AVFileType.m4a)
             
             // add video input
             videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: [
@@ -168,27 +157,10 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                 print("no video input added")
             }
             
-            // add audio input
-            audioWriterInput = AVAssetWriterInput(mediaType: AVMediaType.audio, outputSettings: [
-                AVFormatIDKey: kAudioFormatMPEG4AAC,
-                AVSampleRateKey: 44100,
-                AVNumberOfChannelsKey: 2,
-                AVEncoderBitRateKey: 192000] as [String: Any])
-
-            audioWriterInput.expectsMediaDataInRealTime = true
-
-            if audioWriter.canAdd(audioWriterInput) {
-                audioWriter.add(audioWriterInput)
-                print("audio input added")
-            } else {
-                print("no audio input added")
-            }
-            
             videoWriterInputPixelBufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriterInput, sourcePixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA,kCVPixelFormatOpenGLESCompatibility as String: true,])
             
             
             videoWriter.startWriting()
-            audioWriter.startWriting()
             
         } catch let error {
             debugPrint(error.localizedDescription)
@@ -211,30 +183,9 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         return videoOutputUrl
     }
     
-    func audioFileLocation() -> URL {
-        let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
-        let audioOutputUrl = URL(fileURLWithPath: documentsPath.appendingPathComponent("audioFile")).appendingPathExtension("m4a")
-        do {
-            if FileManager.default.fileExists(atPath: audioOutputUrl.path) {
-                try FileManager.default.removeItem(at: audioOutputUrl)
-                print("file removed")
-            }
-        } catch {
-            print(error)
-        }
-        
-        return audioOutputUrl
-    }
-    
     // MARK: Function to check if the AssetWriter can write or not
     func canWrite() -> Bool {
         return isRecording && videoWriter != nil && videoWriter?.status == .writing
-    }
-    func videoCanWrite() -> Bool {
-        return isRecording && videoWriter != nil && videoWriter!.status == .writing
-    }
-    func audioCanWriter() -> Bool {
-        return isRecording && audioWriter != nil && audioWriter!.status == .writing
     }
     
     // MARK: Start recording
@@ -242,12 +193,9 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         guard !isRecording else { return }
         isRecording = true
         sessionAtSourceTime = nil
-        sessionAtSourceTime2 = nil
-        print("here")
         setupWriter()
         print(isRecording)
         print(videoWriter)
-        print(audioWriter)
         
         if videoWriter.status == .writing {
             print("status writing")
@@ -260,19 +208,6 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         } else {
             print("status completed")
         }
-        
-        if audioWriter.status == .writing {
-            print("status writing")
-        } else if audioWriter.status == .failed {
-            print("status failed")
-        } else if audioWriter.status == .cancelled {
-            print("status cancelled")
-        } else if audioWriter.status == .unknown {
-            print("status unknown")
-        } else {
-            print("status completed")
-        }
-
     }
     
     // MARK: Stop recording
@@ -280,19 +215,12 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         guard isRecording else { return }
         isRecording = false
         videoWriterInput.markAsFinished()
-        audioWriterInput.markAsFinished()
         
         videoWriter.finishWriting { [weak self] in
             self?.sessionAtSourceTime = nil
             print("video writer done")
         }
-        
-        audioWriter.finishWriting { [weak self] in
-            self?.sessionAtSourceTime2 = nil
-            print("audio writer done")
-        }
-        
-        //print("finished writing \(self.outputFileLocation)")
+
         cameraSession.stopRunning()
         performSegue(withIdentifier: "previewVideo", sender: nil)
     }
@@ -325,10 +253,6 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
         let attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, pixelBuffer!, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)) as? [String: Any]
         let ciImage = CIImage(cvImageBuffer: pixelBuffer!, options: attachments)
         
-        // Retreive frame of your buffer
-        //            let desc = CMSampleBufferGetFormatDescription(sampleBuffer)
-        //            let bufferFrame = CMVideoFormatDescriptionGetCleanAperture(desc!, false)
-        
         // Detects faces based on your ciimage
         let features = faceDetector?.features(in: ciImage, options: [CIDetectorEyeBlink : true,
                                                                      ]).compactMap({ $0 as? CIFaceFeature })
@@ -349,16 +273,14 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
             return
         }
         
-        
-        
         for feature in features! {
-            print("Instruction phase: \(phase)")
+            //print("Instruction phase: \(phase)")
             if phase == 0 {
                 instructionPhrase.isHidden = false
                 instructionPhrase.text = "Close your right eye"
                 if feature.rightEyeClosed {
                     rightEyeCounter += 1
-                    print(rightEyeCounter)
+                    //print(rightEyeCounter)
                     if rightEyeCounter == 25 {
                             phase = 1
                             instructionPhrase.text = "Close your left eye"
@@ -369,7 +291,7 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
             } else if phase == 1 {
                 if feature.leftEyeClosed {
                     leftEyeCounter += 1
-                    print(leftEyeCounter)
+                    //print(leftEyeCounter)
                     if leftEyeCounter == 25 {
                             phase = 3
                             instructionPhrase.isHidden = true
@@ -384,16 +306,14 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
     // MARK: AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioOutputSampleBufferDelegate
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
-        //let writable = canWrite()
-        let videoWriable = videoCanWrite()
-        let audioWritable = audioCanWriter()
+        let writable = canWrite()
         
         if CMSampleBufferDataIsReady(sampleBuffer) == false {
             print("not ready")
             return
         }
         
-        if videoWriable {
+        if writable {
             
             if sessionAtSourceTime == nil {
                 // Start Writing
@@ -407,24 +327,6 @@ class ViewController: UIViewController, AVCaptureAudioDataOutputSampleBufferDele
                     // write video buffer
                     videoWriterInput.append(sampleBuffer)
                     //print("video buffering")
-                }
-            }
-        }
-        
-        if audioWritable {
-            
-            if sessionAtSourceTime2 == nil {
-                sessionAtSourceTime2 = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-                audioWriter.startSession(atSourceTime: sessionAtSourceTime2!)
-            }
-
-            if output == audioDataOutput {
-                if audioWriterInput.isReadyForMoreMediaData {
-                    // write audio buffer
-                    audioWriterInput.append(sampleBuffer)
-                    //print("audio buffering")
-                } else {
-                    print("not ready")
                 }
             }
         }
