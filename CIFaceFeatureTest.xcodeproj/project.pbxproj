@@ -15,6 +15,7 @@
 		99AC8A9720FE4F7D00A4CF93 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8A9620FE4F7D00A4CF93 /* ViewController.swift */; };
 		99AC8AF820FF958F00A4CF93 /* VideoPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */; };
 		99DECC9D2110B454005E3220 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99DECC9C2110B454005E3220 /* AudioRecorder.swift */; };
+		99DECC9F2110C896005E3220 /* SessionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99DECC9E2110C896005E3220 /* SessionHandler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		99AC8A9620FE4F7D00A4CF93 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPreviewViewController.swift; sourceTree = "<group>"; };
 		99DECC9C2110B454005E3220 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		99DECC9E2110C896005E3220 /* SessionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 			children = (
 				99AC8A7F20FD014800A4CF93 /* AppDelegate.swift */,
 				99AC8A9620FE4F7D00A4CF93 /* ViewController.swift */,
+				99DECC9E2110C896005E3220 /* SessionHandler.swift */,
 				99DECC9C2110B454005E3220 /* AudioRecorder.swift */,
 				99AC8A8320FD014800A4CF93 /* Main.storyboard */,
 				99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */,
@@ -154,6 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				99AC8AF820FF958F00A4CF93 /* VideoPreviewViewController.swift in Sources */,
+				99DECC9F2110C896005E3220 /* SessionHandler.swift in Sources */,
 				99AC8A9720FE4F7D00A4CF93 /* ViewController.swift in Sources */,
 				99DECC9D2110B454005E3220 /* AudioRecorder.swift in Sources */,
 				99AC8A8020FD014800A4CF93 /* AppDelegate.swift in Sources */,
