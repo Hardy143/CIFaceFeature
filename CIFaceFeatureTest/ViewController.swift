@@ -18,6 +18,7 @@ let cancelRecording = "vicki.hardy.cancel"
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     let sessionHandler = SessionHandler.sharedSession
+    let videoRecorder = VideoRecorder.sharedVideo
     
     @IBOutlet weak var previewView: UIView!
     @IBOutlet weak var recordButton: UIButton!
@@ -54,16 +55,16 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         sessionHandler.cameraSession.startRunning()
-        sessionHandler.phase = 0
+        videoRecorder.phase = 0
     }
     
     @IBAction func recordButtonPressed(_ sender: Any) {
-        if !sessionHandler.isRecording {
-            sessionHandler.start()
+        if !videoRecorder.isRecording {
+            videoRecorder.start()
             audioRecorder.recordAudio()
             recordButton.setTitle("Recording", for: .normal)
         } else {
-            sessionHandler.stop()
+            videoRecorder.stop()
             audioRecorder.stopRecordingAudio()
             recordButton.setTitle("Record", for: .normal)
             performSegue(withIdentifier: "previewVideo", sender: nil)
@@ -84,14 +85,14 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         let phrase = isPhrase0 ? "Close your right eye" : "Close your left eye"
         instructionPhrase.isHidden = false
         instructionPhrase.text = phrase
-        print(sessionHandler.phase)
+        print(videoRecorder.phase)
         recordButton.isHidden = true
     }
     
     @objc func showRecordButton(notification: NSNotification) {
         instructionPhrase.isHidden = true
         recordButton.isHidden = false
-        print(sessionHandler.phase)
+        print(videoRecorder.phase)
     }
     
     @objc func showAlert(notification: NSNotification) {
@@ -182,7 +183,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.destination is VideoPreviewViewController {
             let preview = segue.destination as? VideoPreviewViewController
-            preview?.fileLocation = sessionHandler.outputFileLocation
+            preview?.fileLocation = videoRecorder.outputFileLocation
         }
     }
 
