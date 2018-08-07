@@ -45,13 +45,25 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Lorem ipsum dolor sit er elit lamet, consectetaur cillium " textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="514-Ug-cN3">
+                                <rect key="frame" x="69" y="493" width="237" height="60"/>
+                                <color key="backgroundColor" white="1" alpha="0.60025149828767121" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="D6Y-4Y-kaF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="fev-Fv-3Wh" firstAttribute="centerX" secondItem="Tdc-3h-MVM" secondAttribute="centerX" id="DFY-Xw-dAs"/>
+                            <constraint firstItem="514-Ug-cN3" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="69" id="I7X-Sm-Zbn"/>
                             <constraint firstItem="Fmq-by-H1p" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="IkQ-If-hDd"/>
+                            <constraint firstItem="514-Ug-cN3" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Lcc-ll-DUZ"/>
                             <constraint firstItem="Fmq-by-H1p" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Mds-2i-cfq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="fev-Fv-3Wh" secondAttribute="bottom" constant="20" id="OuK-Yf-hOn"/>
+                            <constraint firstItem="fev-Fv-3Wh" firstAttribute="top" secondItem="514-Ug-cN3" secondAttribute="bottom" constant="50" id="Shi-pj-8ER"/>
                             <constraint firstItem="Tdc-3h-MVM" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="Yax-Y4-PzT"/>
                             <constraint firstItem="Tdc-3h-MVM" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="i25-1k-HHS"/>
                             <constraint firstItem="Tdc-3h-MVM" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="mWa-1G-Olf"/>
@@ -61,6 +73,7 @@
                     </view>
                     <connections>
                         <outlet property="instructionPhrase" destination="Fmq-by-H1p" id="WSK-xB-a93"/>
+                        <outlet property="jsonSentence" destination="514-Ug-cN3" id="jqK-P0-mZO"/>
                         <outlet property="previewView" destination="Tdc-3h-MVM" id="UUQ-wn-jfU"/>
                         <outlet property="recordButton" destination="fev-Fv-3Wh" id="ZT8-iR-rAn"/>
                         <segue destination="mFd-yQ-ON8" kind="presentation" identifier="previewVideo" id="oLF-OA-X4J"/>

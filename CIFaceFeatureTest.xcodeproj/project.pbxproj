@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		998F8DC12119AD9600CF32B0 /* script.json in Resources */ = {isa = PBXBuildFile; fileRef = 998F8DC02119AD9600CF32B0 /* script.json */; };
 		99AC8A8020FD014800A4CF93 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AC8A7F20FD014800A4CF93 /* AppDelegate.swift */; };
 		99AC8A8520FD014800A4CF93 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99AC8A8320FD014800A4CF93 /* Main.storyboard */; };
 		99AC8A8720FD014800A4CF93 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99AC8A8620FD014800A4CF93 /* Assets.xcassets */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		998F8DC02119AD9600CF32B0 /* script.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = script.json; sourceTree = "<group>"; };
 		99AC8A7C20FD014800A4CF93 /* CIFaceFeatureTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CIFaceFeatureTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99AC8A7F20FD014800A4CF93 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99AC8A8420FD014800A4CF93 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 				99AC8AF720FF958F00A4CF93 /* VideoPreviewViewController.swift */,
 				99AC8A8620FD014800A4CF93 /* Assets.xcassets */,
 				99AC8A8820FD014800A4CF93 /* LaunchScreen.storyboard */,
+				998F8DC02119AD9600CF32B0 /* script.json */,
 				99AC8A8B20FD014800A4CF93 /* Info.plist */,
 			);
 			path = CIFaceFeatureTest;
@@ -146,6 +149,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				998F8DC12119AD9600CF32B0 /* script.json in Resources */,
 				99AC8A8A20FD014800A4CF93 /* LaunchScreen.storyboard in Resources */,
 				99AC8A8720FD014800A4CF93 /* Assets.xcassets in Resources */,
 				99AC8A8520FD014800A4CF93 /* Main.storyboard in Resources */,

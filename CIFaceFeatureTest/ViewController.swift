@@ -23,6 +23,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     @IBOutlet weak var previewView: UIView!
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var instructionPhrase: UILabel!
+    @IBOutlet weak var jsonSentence: UITextView!
+    
+    // JSON sentence variables
+    var phrase = ""
+    var phraseCounter = 0
     
     let phrase0 = Notification.Name(rawValue: phase0)
     let phrase1 = Notification.Name(rawValue: phase1)
@@ -41,6 +46,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         
         recordButton.isHidden = true 
         instructionPhrase.isHidden = true
+        jsonSentence.isHidden = true
         sessionHandler.setupCamera()
         audioRecorder.setUpAudioSession()
         createObservers()
@@ -56,6 +62,12 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         super.viewDidAppear(animated)
         sessionHandler.cameraSession.startRunning()
         videoRecorder.phase = 0
+        
+        jsonSentence.isHidden = true
+        if let x = UserDefaults.standard.object(forKey: "phraseCounter") as? Int {
+            phraseCounter = x
+            print("Phrase count: \(phraseCounter)")
+        }
     }
     
     @IBAction func recordButtonPressed(_ sender: Any) {
@@ -63,12 +75,56 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             videoRecorder.start()
             audioRecorder.recordAudio()
             recordButton.setTitle("Recording", for: .normal)
+            
+            jsonSentence.isHidden = false
+            let array = getFromJSON()
+            for a in array {
+                phrase.append("\(a)\n")
+            }
+            
+            jsonSentence.text = phrase
+            
         } else {
             videoRecorder.stop()
             audioRecorder.stopRecordingAudio()
             recordButton.setTitle("Record", for: .normal)
             performSegue(withIdentifier: "previewVideo", sender: nil)
         }
+    }
+    
+    // MARK: Parse JSON file
+    func getFromJSON() -> [String] {
+        
+        phrase = ""
+        var array: [String] = []
+        
+        do {
+            let jsonURL = Bundle.main.url(forResource: "script", withExtension: "json")
+            let jsonDecoder = JSONDecoder()
+            let jsonData = try Data(contentsOf: jsonURL!)
+            let jsonSentence = try jsonDecoder.decode([[String]].self, from: jsonData)
+            
+            for (index, sentence) in jsonSentence.enumerated() {
+                if index == phraseCounter {
+                    for s in sentence {
+                        array.append(s)
+                    }
+                }
+            }
+        } catch {
+            print(error)
+        }
+        
+        phraseCounter += 1
+        print(phraseCounter)
+        
+        if phraseCounter == 209 {
+            phraseCounter = 0
+        }
+        
+        UserDefaults.standard.set(phraseCounter, forKey: "phraseCounter")
+        
+        return array
     }
     
     // MARK: Observer Functions
